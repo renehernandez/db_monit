@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require 'db_monit/cli/runner'
+
+DbMonit::CLI::Runner.start
