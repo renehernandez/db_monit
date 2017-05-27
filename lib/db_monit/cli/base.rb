@@ -22,7 +22,7 @@ module DbMonit
     class Base < Thor
       extend Hooks
 
-      class_option :conf, type: :string, default: 'db.conf',
+      class_option :conf, type: :string,
           desc: 'Specifies the path to the configuration file to connect to db server'
       class_option :daemon, type: :boolean, aliases: :d,
           desc: "Runs the command in background and writes the results to file"
@@ -54,11 +54,15 @@ module DbMonit
       end
 
       def load_conf(conf_file, options)
-        data = YAML.load(File.open(conf_file))
+        data = YAML.load(File.open(conf_file)) if conf_file
 
-        options[:host] ||= data['host']
-        options[:username] ||= data['username']
-        options[:password] ||= data['password']
+        if data
+          options[:host] ||= data['host']
+          options[:username] ||= data['username']
+          options[:password] ||= data['password']
+        end
+
+        raise DbMonit::Errors::NotValidConfError  if !%w(host username password).all? { |c| options.key?(c) }
       end
 
     end
